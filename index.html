@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>10119179_UAS_MOSI_No1</title>
+</head>
+<body>
+    <h1>Simulasi Data Distribusi Segitiga</h1>
+    <form action="" method="post">
+        <label for="data_values">Masukkan Data Distribusi (Gunakan Koma Untuk Pemisah Data):</label>
+        <input type="text" id="data_values" name="data_values">
+        <br>
+        <label for="num_trials">Jumlah Trial:</label>
+        <input type="number" id="num_trials" name="num_trials" min="1" value="20">
+        <br>
+        <input type="submit" value="Simulasikan">
+    </form>
+
+    <?php
+    function generateTriangularData($data_values, $num_trials) {
+        $data = explode(",", $data_values);
+        $data = array_map('intval', $data);
+        $results = [];
+
+        for ($t = 0; $t < $num_trials; $t++) {
+            $trial_results = [];
+
+            foreach ($data as $d) {
+                $a = min($data);
+                $b = $d;
+                $c = max($data);
+
+                $U = mt_rand() / mt_getrandmax(); // random number between 0 and 1
+                if ($U <= ($b - $a) / ($c - $a)) {
+                    $x = $a + sqrt($U * ($b - $a) * ($c - $a));
+                } else {
+                    $x = $c - sqrt((1 - $U) * ($c - $b) * ($c - $a));
+                }
+
+                $trial_results[] = number_format($x, 2); // Format angka dengan 2 angka di belakang titik desimal
+            }
+
+            $results[] = $trial_results;
+        }
+
+        return $results;
+    }
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $data_values = $_POST["data_values"];
+        $num_trials = intval($_POST["num_trials"]);
+
+        $simulated_data = generateTriangularData($data_values, $num_trials);
+
+        echo "<h2>Hasil:</h2>";
+        foreach ($simulated_data as $trial => $results) {
+            echo "<p><strong>Trial " . ($trial + 1) . ":</strong><br>";
+            echo implode(", ", $results) . "</p>";
+        }
+    }
+    ?>
+</body>
+</html>
